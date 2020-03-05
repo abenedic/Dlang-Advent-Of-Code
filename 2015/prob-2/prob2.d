@@ -6,7 +6,7 @@ import std.conv;
 import std.algorithm;
 import std.algorithm.sorting;
 
-long get_sq_feet(const string line){
+int[] parse_line(const string line){
     int i=0;
     int[] sizes=[0,0,0];
     auto elements = line.split("x");
@@ -14,6 +14,11 @@ long get_sq_feet(const string line){
         sizes[i++] = to!int(element);
     }
     sizes.sort();
+    return sizes;
+}
+
+long get_sq_feet(const string line){
+    auto sizes = parse_line(line);
     return 2*sizes[0]*sizes[1]+2*sizes[1]*sizes[2]+2*sizes[2]*sizes[0]+sizes[0]*sizes[1];
 }
 
@@ -22,12 +27,25 @@ unittest{
     assert(res==58);
 }
 
+long get_ribbon_length(const string line){
+    auto sizes = parse_line(line);
+    return 2*(sizes[0]+sizes[1])+sizes[0]*sizes[1]*sizes[2];
+}
+
+unittest{
+    long res = get_ribbon_length("2x3x4");
+    assert(res == 34);
+}
+
 void main(){
     long accum=0;
+    long accum_2 =0;
     foreach(string line; input.splitLines()){
         accum += get_sq_feet(line);
+        accum_2 += get_ribbon_length(line);
     }
     writeln(accum);
+    writeln(accum_2);
 
 }
 
