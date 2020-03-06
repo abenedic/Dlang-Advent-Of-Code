@@ -1,55 +1,115 @@
 module main;
 
 import std.stdio;
+import std.string;
+import std.conv;
+
+enum type{
+    toggle,
+    on,
+    off
+}
+
+struct command{
+    type t;
+    long startx;
+    long starty;
+    long endx;
+    long endy;
+}
+
+command parse_line(string input){
+    auto s = input.split;
+    command c;
+    string[] pairs;
+    if(s[0] == "toggle"){
+        c.t = type.toggle;
+        pairs = [s[1],s[3]];
+    }else{
+        if(s[1] == "on"){
+            c.t = type.on;
+        }else if(s[1]== "off"){
+            c.t=type.off;
+        }
+        pairs = [s[2],s[4]];
+    }
+    long[4] numbers;
+    int i=0;
+    foreach(string nums;pairs){
+        auto n = nums.split(",");
+        foreach(string n1;n){
+            numbers[i++]=to!long(n1);
+        }
+    }
+    c.startx = numbers[0];
+    c.starty = numbers[1];
+    c.endx = numbers[2];
+    c.endy = numbers[3];
+    return c;
+}
 
 
-
-void toggle_rectangle(const inout bool[1000][1000] array,long startx,long starty, long endx,long endy){
-    for(int i=startx; i<=endx;i++){
-        for(int j=starty; j<=endy;j++){
-            array[i][j] != array[i][j];
+void toggle_rectangle(ref int[1000][1000] array,long startx,long starty, long endx,long endy){
+    for(long i=startx; i<=endx;i++){
+        for(long j=starty; j<=endy;j++){
+            array[i][j] += 2;
         }
     }
 }
 
-void seton_rectangle(const inout bool[1000][1000] array,long startx,long starty, long endx,long endy){
-    for(int i=startx; i<=endx;i++){
-        for(int j=starty; j<=endy;j++){
-            array[i][j] = true;
+void seton_rectangle(ref int[1000][1000] array,long startx,long starty, long endx,long endy){
+    for(long i=startx; i<=endx;i++){
+        for(long j=starty; j<=endy;j++){
+            array[i][j] += 1;
         }
     }
 }
 
-void setoff_rectangle(const inout bool[1000][1000] array,long startx,long starty, long endx,long endy){
-    for(int i=startx; i<=endx;i++){
-        for(int j=starty; j<=endy;j++){
-            array[i][j] = false;
+void setoff_rectangle(ref int[1000][1000] array,long startx,long starty, long endx,long endy){
+    for(long i=startx; i<=endx;i++){
+        for(long j=starty; j<=endy;j++){
+            array[i][j] -= 1;
+            if(array[i][j]<0){
+                array[i][j] =0;
+            }
         }
     }
 }
 
-long count(const in bool[1000][1000] array){
+long count(const int[1000][1000] array){
     long output=0;
-    foreach(const bool[1000] a;array){
-        foreach(const bool b; a){
-            if(b){output++;}
+    foreach(const int[1000] a;array){
+        foreach(const int b; a){
+            output+=b;
         }
     }
     return output;
 }
 
 long perform_operations_and_count(string input){
-    bool[1000][1000] b;
+    int[1000][1000] b;
     foreach(string s;input.splitLines()){
-        if
+        auto c = parse_line(s);
+        if(c.t ==type.toggle){
+            toggle_rectangle(b,c.startx,c.starty,c.endx,c.endy);
+        }else if(c.t == type.on){
+            seton_rectangle(b,c.startx,c.starty,c.endx,c.endy);
+        }else if(c.t == type.off){
+            setoff_rectangle(b,c.startx,c.starty,c.endx,c.endy);
+        }
     }
+    return count(b);
 
 }
 
-
+unittest{
+    long res = perform_operations_and_count("turn on 0,0 through 999,999");
+    writeln(res);
+    assert(res == 1000000);
+}
 
 void main(){
-
+    writeln(perform_operations_and_count(input));
 }
 
 
