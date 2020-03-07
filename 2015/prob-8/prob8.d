@@ -1,59 +1,147 @@
- 
 import std.string;
 import std.stdio;
+import std.ascii;
 
+long get_escaped_length(string input)
+{
+    long length = 0;
 
+    long i;
+    while (i < input.length)
+    {
+        if (input[i] == '\\')
+        {
+            i++;
+            if (input[i] == 'x')
+            {
+                i++;
+                if (input[i].isHexDigit && input[i + 1].isHexDigit)
+                {
+                    i += 2;
+                    length++;
+                }
+                //hex escape.
+            }
+            else if (input[i] == '\\' || input[i] == '"')
+            {
+                i++;
+                length++;
+                continue;
+            }
 
-string unescape(string input){
-    string output = input.dup;
-
-
+            continue;
+        }
+        else if (input[i] == '"')
+        {
+            i++;
+            continue;
+        }
+        else
+        {
+            i++;
+            length++;
+        }
+    }
+    return length;
 }
 
-long code_length(string input){
-    long length=0;
-    foreach(string line; input.splitLines){
+long code_length(string input)
+{
+    long length = 0;
+    foreach (string line; input.splitLines)
+    {
         length += line.strip().length;
     }
     return length;
 }
 
-long memory_length(string input){
-    long length=0;
-    foreach(string line; input.splitLines){
-        length += unescape(line.strip()).length;
+long memory_length(string input)
+{
+    long length = 0;
+    foreach (string line; input.splitLines)
+    {
+        length += get_escaped_length(line.strip());
     }
     return length;
 }
 
+long expanded_length(string input)
+{
+    long length = 0;
+    foreach (string line; input.strip.splitLines)
+    {
+        length += get_expanded_length(line.strip());
+    }
+    return length;
+}
 
-long process(string input){
+long get_expanded_length(string input)
+{
+    long length = 2;
+
+    long i;
+    while (i < input.length)
+    {
+        if (input[i] == '\\')
+        {
+            i++;
+            length += 2;
+        }
+        else if (input[i] == '"')
+        {
+
+            i++;
+            length += 2;
+
+        }
+        else
+        {
+            i++;
+            length++;
+        }
+    }
+    return length;
+}
+
+long process(string input)
+{
     long count_code = code_length(input);
     long count_memory = memory_length(input);
 
-    return count_code- count_memory;
+    return count_code - count_memory;
 }
 
-unittest{
+long process2(string input)
+{
+    long count_code = code_length(input);
+    long count_expanded = expanded_length(input);
+
+    return count_expanded - count_code;
+}
+
+unittest
+{
     string input = `
     ""
     "abc"
     "aaa\"aaa"
     "\x27"
 `;
-writeln(process(input));
-assert(process(input) == 12);
+    writeln(process(input));
+    assert(process(input) == 12);
+    assert(expanded_length(`"abc"`) == 9);
+    assert(expanded_length(`"aaa\"aaa"`) == 16);
+    assert(expanded_length(`"\x27"`) == 11);
+    writeln(expanded_length(input));
+    assert(process2(input) == 19);
 }
 
-
-
-void main(){
+void main()
+{
+    writeln(process(input));
+    writeln(process2(input));
 
 }
-
-
-
-
 
 string input = `"\xa8br\x8bjr\""
 "nq"
