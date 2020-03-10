@@ -2,35 +2,125 @@ import std.string;
 import std.stdio;
 import std.conv;
 import std.algorithm.sorting;
+import std.math;
+import std.ascii;
+import std.algorithm.iteration;
 
-
-
-struct Aunt{
-    double children =double.nan;
-    double cats =double.nan;
-    double samoyeds =double.nan;
-    double pomeranians =double.nan;
-    double akitas =double.nan;
-    double vizslas =double.nan;
-    double goldfish =double.nan;
-    double trees =double.nan;
-    double cars =double.nan;
-    double perfumes =double.nan;
+bool is_split_char(const dchar a)
+{
+    return a.isWhite || a == ':' || a == ',';
 }
 
+bool not_is_empty(string s)
+{
+    return !s.empty;
+}
 
-string target=`children: 3
-cats: 7
-samoyeds: 2
-pomeranians: 3
-akitas: 0
-vizslas: 0
-goldfish: 5
-trees: 3
-cars: 2
-perfumes: 1`;
+bool not_is_empty(string[] s)
+{
+    return true;
+}
 
-string known =`Sue 1: goldfish: 6, trees: 9, akitas: 0
+template case_(string input)
+{
+    const char[] case_ = "case \"" ~ input ~ "\": " ~ input ~ " = to!double(t[i+1]); break;";
+}
+
+struct Aunt
+{
+    double children = double.nan;
+    double cats = double.nan;
+    double samoyeds = double.nan;
+    double pomeranians = double.nan;
+    double akitas = double.nan;
+    double vizslas = double.nan;
+    double goldfish = double.nan;
+    double trees = double.nan;
+    double cars = double.nan;
+    double perfumes = double.nan;
+    int number = -1;
+    this(string input)
+    {
+        auto r = split!is_split_char(input);
+        string[] t;
+        foreach (s; r)
+        {
+            if (!s.empty)
+            {
+                t ~= s;
+            }
+        }
+        number = to!int(t[1]);
+        for (int i = 2; i < t.length; i += 2)
+        {
+            final switch (t[i])
+            {
+                mixin(case_!"children");
+                mixin(case_!"cats");
+                mixin(case_!"samoyeds");
+                mixin(case_!"pomeranians");
+                mixin(case_!"akitas");
+                mixin(case_!"vizslas");
+                mixin(case_!"goldfish");
+                mixin(case_!"trees");
+                mixin(case_!"cars");
+                mixin(case_!"perfumes");
+            }
+        }
+    }
+
+}
+
+template maybe_match(string field)
+{
+    const char[] maybe_match = "if(!a." ~ field ~ ".isNaN){m &= target." ~ field
+        ~ " == a." ~ field ~ ";}";
+}
+
+template maybe_match_greater(string field)
+{
+    const char[] maybe_match_greater = "if(!a." ~ field ~ ".isNaN){m &= target." ~ field
+        ~ " < a." ~ field ~ ";}";
+}
+
+template maybe_match_fewer(string field)
+{
+    const char[] maybe_match_fewer = "if(!a." ~ field ~ ".isNaN){m &= target." ~ field
+        ~ " > a." ~ field ~ ";}";
+}
+
+bool is_match(Aunt target, Aunt a)
+{
+    bool m = true;
+    mixin(maybe_match!"children");
+    mixin(maybe_match_greater!"cats");
+    mixin(maybe_match!"samoyeds");
+    mixin(maybe_match_fewer!"pomeranians");
+    mixin(maybe_match!"akitas");
+    mixin(maybe_match!"vizslas");
+    mixin(maybe_match_fewer!"goldfish");
+    mixin(maybe_match_greater!"trees");
+    mixin(maybe_match!"cars");
+    mixin(maybe_match!"perfumes");
+    return m;
+}
+
+void main()
+{
+    Aunt t = Aunt(target);
+    foreach (s; known.splitLines)
+    {
+        Aunt k = Aunt(s);
+        if (is_match(t, k))
+        {
+            writeln(k.number);
+        }
+    }
+}
+
+string target = `Sue 0: children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 5, trees: 3, cars: 2, perfumes: 1`;
+
+string known = `Sue 1: goldfish: 6, trees: 9, akitas: 0
 Sue 2: goldfish: 7, trees: 1, akitas: 0
 Sue 3: cars: 10, akitas: 6, perfumes: 7
 Sue 4: perfumes: 2, vizslas: 0, cars: 6
