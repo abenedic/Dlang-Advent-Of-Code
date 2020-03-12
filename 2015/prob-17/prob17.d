@@ -7,13 +7,19 @@ import std.ascii;
 import std.algorithm.iteration;
 import std.algorithm.mutation;
 import std.range;
+import std.algorithm;
 
-long fits_exactly(long amount, int[] containers)
+shared long[] counts;
+
+long fits_exactly(long amount, int[] containers, long count)
 {
+    if(count >4){
+        return 0;
+    }
     if (amount == 0)
     {
-        writeln("Remaining ", containers);
-        return 1;
+      counts ~= count;
+      return 1;
     }
     if (amount < 0)
     {
@@ -24,7 +30,7 @@ long fits_exactly(long amount, int[] containers)
     }
     auto s = containers[0];
     containers.popFront;
-    return fits_exactly(amount - s, containers) + fits_exactly(amount, containers);
+    return fits_exactly(amount - s, containers, count +1) + fits_exactly(amount, containers, count);
 }
 
 long count_ways(string input, long amount)
@@ -37,8 +43,8 @@ long count_ways(string input, long amount)
     }
     containers.sort!"a>b";
     writeln(containers);
-    long count = fits_exactly(amount, containers);
-
+    long count = fits_exactly(amount, containers,0);
+    writeln(counts.minElement);
     return count;
 }
 
