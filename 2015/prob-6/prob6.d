@@ -4,13 +4,15 @@ import std.stdio;
 import std.string;
 import std.conv;
 
-enum type{
+enum type
+{
     toggle,
     on,
     off
 }
 
-struct command{
+struct command
+{
     type t;
     long startx;
     long starty;
@@ -18,27 +20,36 @@ struct command{
     long endy;
 }
 
-command parse_line(string input){
+command parse_line(string input)
+{
     auto s = input.split;
     command c;
     string[] pairs;
-    if(s[0] == "toggle"){
+    if (s[0] == "toggle")
+    {
         c.t = type.toggle;
-        pairs = [s[1],s[3]];
-    }else{
-        if(s[1] == "on"){
+        pairs = [s[1], s[3]];
+    }
+    else
+    {
+        if (s[1] == "on")
+        {
             c.t = type.on;
-        }else if(s[1]== "off"){
-            c.t=type.off;
         }
-        pairs = [s[2],s[4]];
+        else if (s[1] == "off")
+        {
+            c.t = type.off;
+        }
+        pairs = [s[2], s[4]];
     }
     long[4] numbers;
-    int i=0;
-    foreach(string nums;pairs){
+    int i = 0;
+    foreach (string nums; pairs)
+    {
         auto n = nums.split(",");
-        foreach(string n1;n){
-            numbers[i++]=to!long(n1);
+        foreach (string n1; n)
+        {
+            numbers[i++] = to!long(n1);
         }
     }
     c.startx = numbers[0];
@@ -48,71 +59,90 @@ command parse_line(string input){
     return c;
 }
 
-
-void toggle_rectangle(ref int[1000][1000] array,long startx,long starty, long endx,long endy){
-    for(long i=startx; i<=endx;i++){
-        for(long j=starty; j<=endy;j++){
+void toggle_rectangle(ref int[1000][1000] array, long startx, long starty, long endx, long endy)
+{
+    for (long i = startx; i <= endx; i++)
+    {
+        for (long j = starty; j <= endy; j++)
+        {
             array[i][j] += 2;
         }
     }
 }
 
-void seton_rectangle(ref int[1000][1000] array,long startx,long starty, long endx,long endy){
-    for(long i=startx; i<=endx;i++){
-        for(long j=starty; j<=endy;j++){
+void seton_rectangle(ref int[1000][1000] array, long startx, long starty, long endx, long endy)
+{
+    for (long i = startx; i <= endx; i++)
+    {
+        for (long j = starty; j <= endy; j++)
+        {
             array[i][j] += 1;
         }
     }
 }
 
-void setoff_rectangle(ref int[1000][1000] array,long startx,long starty, long endx,long endy){
-    for(long i=startx; i<=endx;i++){
-        for(long j=starty; j<=endy;j++){
+void setoff_rectangle(ref int[1000][1000] array, long startx, long starty, long endx, long endy)
+{
+    for (long i = startx; i <= endx; i++)
+    {
+        for (long j = starty; j <= endy; j++)
+        {
             array[i][j] -= 1;
-            if(array[i][j]<0){
-                array[i][j] =0;
+            if (array[i][j] < 0)
+            {
+                array[i][j] = 0;
             }
         }
     }
 }
 
-long count(const int[1000][1000] array){
-    long output=0;
-    foreach(const int[1000] a;array){
-        foreach(const int b; a){
-            output+=b;
+long count(const int[1000][1000] array)
+{
+    long output = 0;
+    foreach (const int[1000] a; array)
+    {
+        foreach (const int b; a)
+        {
+            output += b;
         }
     }
     return output;
 }
 
-long perform_operations_and_count(string input){
+long perform_operations_and_count(string input)
+{
     int[1000][1000] b;
-    foreach(string s;input.splitLines()){
+    foreach (string s; input.splitLines())
+    {
         auto c = parse_line(s);
-        if(c.t ==type.toggle){
-            toggle_rectangle(b,c.startx,c.starty,c.endx,c.endy);
-        }else if(c.t == type.on){
-            seton_rectangle(b,c.startx,c.starty,c.endx,c.endy);
-        }else if(c.t == type.off){
-            setoff_rectangle(b,c.startx,c.starty,c.endx,c.endy);
+        if (c.t == type.toggle)
+        {
+            toggle_rectangle(b, c.startx, c.starty, c.endx, c.endy);
+        }
+        else if (c.t == type.on)
+        {
+            seton_rectangle(b, c.startx, c.starty, c.endx, c.endy);
+        }
+        else if (c.t == type.off)
+        {
+            setoff_rectangle(b, c.startx, c.starty, c.endx, c.endy);
         }
     }
     return count(b);
 
 }
 
-unittest{
+unittest
+{
     long res = perform_operations_and_count("turn on 0,0 through 999,999");
     writeln(res);
     assert(res == 1000000);
 }
 
-void main(){
+void main()
+{
     writeln(perform_operations_and_count(input));
 }
-
-
 
 string input = `toggle 461,550 through 564,900
 turn off 370,39 through 425,839

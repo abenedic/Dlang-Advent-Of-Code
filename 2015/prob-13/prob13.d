@@ -4,34 +4,34 @@ import std.conv;
 
 import std.algorithm.sorting;
 
-
-
-
-
-
-int[][] build_graph(string input){
+int[][] build_graph(string input)
+{
     int[string] map;
-    int i=0;
-    foreach(string s; input.splitLines){
+    int i = 0;
+    foreach (string s; input.splitLines)
+    {
         auto t = s.split[0];
-        if(t !in map){
+        if (t !in map)
+        {
             map[t] = i++;
         }
     }
-    int[][] graph= new int[][](map.length+1,map.length+1);
-    foreach(string s; input.splitLines){
+    int[][] graph = new int[][](map.length + 1, map.length + 1);
+    foreach (string s; input.splitLines)
+    {
         auto t = s.split;
         auto first = map[t[0]];
         auto second = t[10];
         auto gain_or_lose = t[2];
         auto amount = t[3];
-        auto value = (gain_or_lose =="gain") ? to!int(amount) : -to!int(amount);
-        second = second[0..second.length-1];
+        auto value = (gain_or_lose == "gain") ? to!int(amount) : -to!int(amount);
+        second = second[0 .. second.length - 1];
         graph[first][map[second]] = value;
     }
-    for(int j=0; j<graph[0].length;j++){
-        graph[j][map.length] =0;
-        graph[map.length][j] =0;
+    for (int j = 0; j < graph[0].length; j++)
+    {
+        graph[j][map.length] = 0;
+        graph[map.length][j] = 0;
     }
 
     return graph;
@@ -48,18 +48,20 @@ ushort[] get_initial_path(ushort num)
     return output;
 }
 
-
-long evaluate_happiness(int[][] graph, ushort[] path){
-    long h=0;
-    for(int i=0; i<path.length; i++){
-        h += graph[path[i]][path[(i+1)%path.length]] + graph[path[(i+1)%path.length]][path[i]];
+long evaluate_happiness(int[][] graph, ushort[] path)
+{
+    long h = 0;
+    for (int i = 0; i < path.length; i++)
+    {
+        h += graph[path[i]][path[(i + 1) % path.length]] + graph[path[(i + 1) % path.length]][path[i]];
     }
     writeln(h);
     return h;
-}    
+}
 
-long optimal_happiness(string input){
-    auto graph =build_graph(input);
+long optimal_happiness(string input)
+{
+    auto graph = build_graph(input);
     writeln(graph);
     immutable ushort num = to!ushort(graph[0].length);
     long happiness = long.min;
@@ -76,10 +78,9 @@ long optimal_happiness(string input){
     return happiness;
 }
 
-
-
-unittest{
-    string input=`Alice would gain 54 happiness units by sitting next to Bob.
+unittest
+{
+    string input = `Alice would gain 54 happiness units by sitting next to Bob.
 Alice would lose 79 happiness units by sitting next to Carol.
 Alice would lose 2 happiness units by sitting next to David.
 Bob would gain 83 happiness units by sitting next to Alice.
@@ -92,16 +93,17 @@ David would gain 46 happiness units by sitting next to Alice.
 David would lose 7 happiness units by sitting next to Bob.
 David would gain 41 happiness units by sitting next to Carol.
 `;
-long h =optimal_happiness(input);
-writeln(h);
-assert(h ==330 );
+    long h = optimal_happiness(input);
+    writeln(h);
+    assert(h == 330);
 }
 
-void main(){
+void main()
+{
     writeln(optimal_happiness(input));
 }
 
-string input =`Alice would gain 54 happiness units by sitting next to Bob.
+string input = `Alice would gain 54 happiness units by sitting next to Bob.
 Alice would lose 81 happiness units by sitting next to Carol.
 Alice would lose 42 happiness units by sitting next to David.
 Alice would gain 89 happiness units by sitting next to Eric.

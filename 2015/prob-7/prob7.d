@@ -80,23 +80,36 @@ token[] lex(string s)
 void interpret_line(string s, ref ushort[string] o)
 {
     token[] t = lex(s);
-    if (t[0].t == token.type.not && t[1].t == token.type.identifier && t[2].t == token.type.arrow && t[3].t == token.type.identifier)
+    if (t[0].t == token.type.not && t[1].t == token.type.identifier
+            && t[2].t == token.type.arrow && t[3].t == token.type.identifier)
     {
         o[t[3].value] = ~o[t[1].value];
         return;
     }
-    else if (t[0].t == token.type.identifier && (t[2].t == token.type.identifier || t[2].t == token.type.integer) && t[4].t == token.type.identifier)
+    else if (t[0].t == token.type.identifier
+            && (t[2].t == token.type.identifier || t[2].t == token.type.integer)
+            && t[4].t == token.type.identifier)
     {
         string id1 = t[0].value;
         string id2 = t[2].value;
         string res = t[4].value;
         ushort value;
-        switch(t[1].t){
-            case token.type.and: o[res] = o[id1] & o[id2]; return;
-            case token.type.or: o[res] = o[id1] | o[id2]; return;
-            case token.type.rshift: o[res] = o[id1] >>> to!ushort(id2); return;
-            case token.type.lshift: o[res] =to!ushort( o[id1] << to!ushort(id2)); return;
-            default: assert(0);
+        switch (t[1].t)
+        {
+        case token.type.and:
+            o[res] = o[id1] & o[id2];
+            return;
+        case token.type.or:
+            o[res] = o[id1] | o[id2];
+            return;
+        case token.type.rshift:
+            o[res] = o[id1] >>> to!ushort(id2);
+            return;
+        case token.type.lshift:
+            o[res] = to!ushort(o[id1] << to!ushort(id2));
+            return;
+        default:
+            assert(0);
         }
     }
     else if (t[0].t == token.type.integer && t[1].t == token.type.arrow

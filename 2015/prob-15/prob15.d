@@ -30,11 +30,13 @@ int[5][] get_vectors(string input)
 long evaluate(int[5][] vectors, int[] weights)
 {
     long value = 1;
-    long calories =0;
-    for(int i =0; i<vectors.length;i++){
-        calories+=weights[i]*vectors[i][4];
+    long calories = 0;
+    for (int i = 0; i < vectors.length; i++)
+    {
+        calories += weights[i] * vectors[i][4];
     }
-    if(calories!=500){
+    if (calories != 500)
+    {
         return 0;
     }
 
@@ -88,8 +90,8 @@ long optmial_score(string input)
         }
         else
         {
-            int j = 100-i;
-            weights[1]=j;
+            int j = 100 - i;
+            weights[1] = j;
             long val = evaluate(scores, weights);
             if (val > best)
             {

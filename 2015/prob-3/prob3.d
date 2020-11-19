@@ -28,11 +28,12 @@ struct cursor
 
     int opCmp(ref const cursor s) const
     {
-        int hz = this.horizontal-s.horizontal;
-        if(hz !=0){
+        int hz = this.horizontal - s.horizontal;
+        if (hz != 0)
+        {
             return hz;
         }
-        int vz = this.vertical-s.vertical;
+        int vz = this.vertical - s.vertical;
         return vz;
     }
 
@@ -43,7 +44,7 @@ struct cursor
 
 struct position_list
 {
-    auto list = redBlackTree!(false,cursor)();
+    auto list = redBlackTree!(false, cursor)();
     void insert(cursor c)
     {
         list.insert(c);
@@ -60,31 +61,37 @@ long house_count(string input)
     cursor c;
     position_list p;
     p.list.clear();
-    c.vertical=0;
-    c.horizontal=0;
+    c.vertical = 0;
+    c.horizontal = 0;
     p.insert(c);
-    foreach(const char a; input){
+    foreach (const char a; input)
+    {
         c.update_position(a);
         p.insert(c);
     }
     return p.get_count;
 }
 
-long house_count_2(string input){
-    cursor c;   
+long house_count_2(string input)
+{
+    cursor c;
     cursor c_2;
     position_list p;
     p.list.clear();
-    c.vertical=0;
-    c.horizontal=0;
-    c_2.horizontal=0;
-    c_2.vertical=0;
+    c.vertical = 0;
+    c.horizontal = 0;
+    c_2.horizontal = 0;
+    c_2.vertical = 0;
     p.insert(c);
-    int i=0;
-    foreach(const char a; input){
-        if(i++ %2==0){
+    int i = 0;
+    foreach (const char a; input)
+    {
+        if (i++ % 2 == 0)
+        {
             c.update_position(a);
-        }else{
+        }
+        else
+        {
             c_2.update_position(a);
         }
         p.insert(c);
@@ -93,8 +100,6 @@ long house_count_2(string input){
     return p.get_count;
 
 }
-
-
 
 unittest
 {
@@ -109,7 +114,8 @@ unittest
     assert(res == 2);
 }
 
-unittest{
+unittest
+{
     long res = house_count_2("^v");
     writeln(res);
     assert(res == 3);
@@ -120,7 +126,6 @@ unittest{
     writeln(res);
     assert(res == 11);
 }
-
 
 void main()
 {

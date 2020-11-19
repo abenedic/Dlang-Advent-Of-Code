@@ -89,7 +89,8 @@ void interpret_line(string s, ref operation[string] o)
 {
     token[] t = lex(s);
 
-    if(t[1].t == type.arrow){
+    if (t[1].t == type.arrow)
+    {
         operation op;
         op.t = type.assign;
         op.args[0] = t[0];
@@ -97,8 +98,7 @@ void interpret_line(string s, ref operation[string] o)
         return;
     }
 
-    if (t[0].t == type.not && t[1].t == type.id && t[2].t == type.arrow
-            && t[3].t == type.id)
+    if (t[0].t == type.not && t[1].t == type.id && t[2].t == type.arrow && t[3].t == type.id)
     {
         operation op;
         op.t = type.not;
@@ -106,8 +106,8 @@ void interpret_line(string s, ref operation[string] o)
         o[t[3].s] = op;
         return;
     }
-    else if ((t[0].t == type.id || t[0].t == type.integer) && (t[2].t == type.id
-            || t[2].t == type.integer) && t[4].t == type.id)
+    else if ((t[0].t == type.id || t[0].t == type.integer)
+            && (t[2].t == type.id || t[2].t == type.integer) && t[4].t == type.id)
     {
         string res = t[4].s;
         operation op;
@@ -165,20 +165,24 @@ operation[string] get_out_wires(string input)
     return output;
 }
 
-ushort evaluate(ref operation[string] o, string wire){
-    if(wire[0].isDigit){
+ushort evaluate(ref operation[string] o, string wire)
+{
+    if (wire[0].isDigit)
+    {
         return to!ushort(wire);
     }
     writefln("Evaluating: %s", wire);
     operation op = o[wire];
     writeln(op);
-    ushort value=0;
+    ushort value = 0;
 
-    if(op.t == type.assign && op.args[0].t == type.integer){
+    if (op.t == type.assign && op.args[0].t == type.integer)
+    {
         return to!ushort(op.args[0].s);
     }
-    if(op.t == type.assign && op.args[0].t == type.id){
-        value = evaluate(o,op.args[0].s);
+    if (op.t == type.assign && op.args[0].t == type.id)
+    {
+        value = evaluate(o, op.args[0].s);
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
@@ -186,8 +190,9 @@ ushort evaluate(ref operation[string] o, string wire){
         o[wire] = op1;
         return value;
     }
-    if(op.t == type.not && op.args[0].t ==type.id){
-        value = ~evaluate(o,op.args[0].s);
+    if (op.t == type.not && op.args[0].t == type.id)
+    {
+        value = ~evaluate(o, op.args[0].s);
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
@@ -195,17 +200,19 @@ ushort evaluate(ref operation[string] o, string wire){
         o[wire] = op1;
         return value;
     }
-    if(op.t == type.not && op.args[0].t ==type.integer){
+    if (op.t == type.not && op.args[0].t == type.integer)
+    {
         value = ~to!ushort(op.args[0].s);
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
-        op1.args[0].s= to!string(value);
+        op1.args[0].s = to!string(value);
         o[wire] = op1;
         return value;
     }
-    if(op.t == type.and){
-        value = evaluate(o,op.args[0].s) & evaluate(o,op.args[1].s);
+    if (op.t == type.and)
+    {
+        value = evaluate(o, op.args[0].s) & evaluate(o, op.args[1].s);
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
@@ -213,8 +220,9 @@ ushort evaluate(ref operation[string] o, string wire){
         o[wire] = op1;
         return value;
     }
-    if(op.t == type.or){
-        value = evaluate(o,op.args[0].s) | evaluate(o,op.args[1].s);
+    if (op.t == type.or)
+    {
+        value = evaluate(o, op.args[0].s) | evaluate(o, op.args[1].s);
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
@@ -222,8 +230,9 @@ ushort evaluate(ref operation[string] o, string wire){
         o[wire] = op1;
         return value;
     }
-    if(op.t == type.lshift){
-        value = to!ushort(evaluate(o,op.args[0].s) << evaluate(o,op.args[1].s));
+    if (op.t == type.lshift)
+    {
+        value = to!ushort(evaluate(o, op.args[0].s) << evaluate(o, op.args[1].s));
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
@@ -231,8 +240,9 @@ ushort evaluate(ref operation[string] o, string wire){
         o[wire] = op1;
         return value;
     }
-    if(op.t == type.rshift){
-        value = evaluate(o,op.args[0].s) >>> evaluate(o,op.args[1].s);
+    if (op.t == type.rshift)
+    {
+        value = evaluate(o, op.args[0].s) >>> evaluate(o, op.args[1].s);
         operation op1;
         op1.t = type.assign;
         op1.args[0].t = type.integer;
@@ -259,20 +269,18 @@ NOT y -> i`;
 
     auto array = get_out_wires(input);
     writeln(array);
-    assert(evaluate(array,"d") == 72);
-    assert(evaluate(array,"e")== 507);
-    assert(evaluate(array,"f") == 492);
-    assert(evaluate(array,"g") == 114);
-    assert(evaluate(array,"h") == 65412);
-    assert(evaluate(array,"i") == 65079);
-    assert(evaluate(array,"x") == 123);
-    assert(evaluate(array,"y") == 456);
+    assert(evaluate(array, "d") == 72);
+    assert(evaluate(array, "e") == 507);
+    assert(evaluate(array, "f") == 492);
+    assert(evaluate(array, "g") == 114);
+    assert(evaluate(array, "h") == 65412);
+    assert(evaluate(array, "i") == 65079);
+    assert(evaluate(array, "x") == 123);
+    assert(evaluate(array, "y") == 456);
 }
 
-
-
-
-void main(){
+void main()
+{
     operation[string] o;
     o = get_out_wires(input);
     operation op;
@@ -280,7 +288,7 @@ void main(){
     op.args[0].t = type.integer;
     op.args[0].s = "956";
     o["b"] = op;
-    writeln(evaluate(o,"a"));
+    writeln(evaluate(o, "a"));
 }
 
 string input = `af AND ah -> ai
@@ -622,4 +630,3 @@ o AND q -> r
 NOT p -> q
 k AND m -> n
 as RSHIFT 2 -> at`;
-

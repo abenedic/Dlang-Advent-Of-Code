@@ -10,49 +10,53 @@ import std.range;
 import std.algorithm;
 import std.regex;
 
+int boss_damage = 8;
+int boss_armor = 2;
+int boss_hitpoints = 109;
 
-
-int boss_damage =8;
-int boss_armor=2;
-int boss_hitpoints=109;
-
-
-int player_hitpoints=100;
+int player_hitpoints = 100;
 const int max_damage = 14;
 const int max_armor = 14;
 bool[max_damage][max_armor] results;
-int[max_damage][max_armor]  costs;
+int[max_damage][max_armor] costs;
 
-bool fight(int player_hitpoints, int player_armor, int player_damage,int boss_hitpoints, int boss_armor, int boss_damage){
-int player_to_boss = player_damage - boss_armor;
-player_to_boss = player_to_boss<1?1:player_to_boss;
-int boss_to_player = boss_damage - player_armor;
-boss_to_player= boss_to_player<1?1:boss_to_player;
+bool fight(int player_hitpoints, int player_armor, int player_damage,
+		int boss_hitpoints, int boss_armor, int boss_damage)
+{
+	int player_to_boss = player_damage - boss_armor;
+	player_to_boss = player_to_boss < 1 ? 1 : player_to_boss;
+	int boss_to_player = boss_damage - player_armor;
+	boss_to_player = boss_to_player < 1 ? 1 : boss_to_player;
 
-int i=0;
-while(player_hitpoints >0 && boss_hitpoints>0){
-	if(i++%2==0){
-		boss_hitpoints -= player_to_boss;
-	}else{
-		player_hitpoints -= boss_to_player;
+	int i = 0;
+	while (player_hitpoints > 0 && boss_hitpoints > 0)
+	{
+		if (i++ % 2 == 0)
+		{
+			boss_hitpoints -= player_to_boss;
+		}
+		else
+		{
+			player_hitpoints -= boss_to_player;
+		}
 	}
-}
-if(player_hitpoints>0){
-	return true;
-}
-return false;
-}
-
-
-unittest{
-
-assert(fight(8,5,5,12,2,7));
-
+	if (player_hitpoints > 0)
+	{
+		return true;
+	}
+	return false;
 }
 
+unittest
+{
 
-bool curried_fight(int player_armor, int player_damage){
-	return fight(100,player_armor, player_damage,boss_hitpoints,boss_armor,boss_damage);
+	assert(fight(8, 5, 5, 12, 2, 7));
+
+}
+
+bool curried_fight(int player_armor, int player_damage)
+{
+	return fight(100, player_armor, player_damage, boss_hitpoints, boss_armor, boss_damage);
 }
 //Min damage=4; max armor 8; boundary is +damage -armor.
 //  Damage Armor
@@ -62,13 +66,19 @@ bool curried_fight(int player_armor, int player_damage){
 //  7      5 40+93 less than this.
 //	8	   4 65+73
 
-void print_results(){
-	for(int i=0;i <max_damage; i++){
+void print_results()
+{
+	for (int i = 0; i < max_damage; i++)
+	{
 
-		for(int j=0; j<max_armor; j++){
-			if(results[i][j]){
+		for (int j = 0; j < max_armor; j++)
+		{
+			if (results[i][j])
+			{
 				printf("t");
-			}else{
+			}
+			else
+			{
 				printf("f");
 			}
 		}
@@ -76,60 +86,74 @@ void print_results(){
 	}
 }
 
+int[5] weapon_cost = [8, 10, 25, 40, 74];
+int[5] weapon_value = [4, 5, 6, 7, 8];
+int[6] armor_cost = [0, 13, 31, 53, 75, 102];
+int[6] armor_value = [0, 1, 2, 3, 4, 5];
+int[8] ring_armor_value = [0, 0, 0, 0, 0, 1, 2, 3];
+int[8] ring_weapon_value = [0, 0, 1, 2, 3, 0, 0, 0];
+int[8] ring_cost = [0, 0, 25, 50, 100, 20, 40, 80];
 
-int[5] weapon_cost = [8,10,25,40,74];
-int[5] weapon_value =[4,5,6,7,8];
-int[6] armor_cost = [0,13,31,53,75,102];
-int[6] armor_value = [0,1,2,3,4,5];
-int[8] ring_armor_value = [0,0,0,0,0,1,2,3];
-int[8] ring_weapon_value = [0,0,1,2,3,0,0,0];
-int[8] ring_cost=[0,0,25,50,100,20,40,80];
+int main()
+{
 
-
-int main(){
-
-	for(int i=0;i <max_damage; i++){
-		for(int j=0; j<max_armor; j++){
-			results[i][j] = curried_fight(j,i);
-			costs[i][j]=-1;
+	for (int i = 0; i < max_damage; i++)
+	{
+		for (int j = 0; j < max_armor; j++)
+		{
+			results[i][j] = curried_fight(j, i);
+			costs[i][j] = -1;
 		}
 	}
-	for(int weapon=0; weapon<5; weapon++){
-		for(int armor=0; armor<6; armor++){
-		for(int ring1 =0; ring1<7;ring1++){
-			for(int ring2=ring1+1;ring2<8;ring2++){
-				int cost = weapon_cost[weapon]+armor_cost[armor]+ring_cost[ring1]+ring_cost[ring2];
-				int damage = weapon_value[weapon]+ring_weapon_value[ring1]+ring_weapon_value[ring2];
-				int armor_ = armor_value[armor]+ring_armor_value[ring1]+ring_armor_value[ring2];
-				costs[damage][armor_] = cost>costs[damage][armor_]?cost:costs[damage][armor_];
+	for (int weapon = 0; weapon < 5; weapon++)
+	{
+		for (int armor = 0; armor < 6; armor++)
+		{
+			for (int ring1 = 0; ring1 < 7; ring1++)
+			{
+				for (int ring2 = ring1 + 1; ring2 < 8; ring2++)
+				{
+					int cost = weapon_cost[weapon] + armor_cost[armor]
+						+ ring_cost[ring1] + ring_cost[ring2];
+					int damage = weapon_value[weapon]
+						+ ring_weapon_value[ring1] + ring_weapon_value[ring2];
+					int armor_ = armor_value[armor] + ring_armor_value[ring1]
+						+ ring_armor_value[ring2];
+					costs[damage][armor_] = cost > costs[damage][armor_] ? cost
+						: costs[damage][armor_];
+				}
 			}
-		}
-
 
 		}
 	}
-for(int i=0;i <max_damage; i++){
+	for (int i = 0; i < max_damage; i++)
+	{
 
-		for(int j=0; j<max_armor; j++){
-				printf("%i, ",costs[i][j]);
+		for (int j = 0; j < max_armor; j++)
+		{
+			printf("%i, ", costs[i][j]);
 		}
 		writeln();
 	}
 
 	print_results();
-	int min =0;
-	for(int i=0;i <max_damage; i++){
+	int min = 0;
+	for (int i = 0; i < max_damage; i++)
+	{
 
-		for(int j=0; j<max_armor; j++){
-				if(!results[i][j]){
-					if(costs[i][j]>min){
-						min=costs[i][j];
-					}
+		for (int j = 0; j < max_armor; j++)
+		{
+			if (!results[i][j])
+			{
+				if (costs[i][j] > min)
+				{
+					min = costs[i][j];
 				}
+			}
 		}
 	}
 
-writeln(min);
+	writeln(min);
 
 	return 0;
 }
@@ -142,7 +166,7 @@ writeln(min);
  * for example, two rings of Damage +3.
  * */
 
-string store_input= `Weapons:    Cost  Damage  Armor
+string store_input = `Weapons:    Cost  Damage  Armor
 Dagger        8     4       0
 Shortsword   10     5       0
 Warhammer    25     6       0
@@ -164,8 +188,7 @@ Defense +1   20     0       1
 Defense +2   40     0       2
 Defense +3   80     0       3`; //6 rings so 30 permutations of rings.
 
-string player_input =`Hit Points: 100`;
-string boss_input= `Hit Points: 109
+string player_input = `Hit Points: 100`;
+string boss_input = `Hit Points: 109
 Damage: 8
 Armor: 2`;
-
